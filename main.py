@@ -13,6 +13,7 @@ class MsgHandle(wxRobot.WeChatEventSink):
 
     def OnGetMessageEvent(self, msg):
         msg = json.loads(msg[0])
+        print(msg)
 
         is_send_msg = msg['isSendMsg']
         message = msg['message']
@@ -25,7 +26,7 @@ class MsgHandle(wxRobot.WeChatEventSink):
 
         # 如果是文本信息
         if type_msg == 1:
-            res_msg = chatgpt.text_handle(sender, message)
+            res_msg = chatgpt.text_handle(sender, is_send_msg, message)
 
         if res_msg is not None:
             robot.SendText(sender, res_msg)
