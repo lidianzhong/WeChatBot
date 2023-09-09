@@ -70,7 +70,7 @@ class Assistant:
         return response
 
 
-def text_handle(uuid, is_send_msg, message: str) -> str:
+def text_handle(uuid: str, is_send_msg, message: str) -> str:
     print('----------文本消息----------')
     print('sender:', uuid)
     print('message:', message)
@@ -86,16 +86,13 @@ def text_handle(uuid, is_send_msg, message: str) -> str:
     # 先对管理员命令处理
     assistant: Assistant = assistant_dict[uuid]
     # 管理员并且触发命令
-    if is_send_msg == 1 and message.startswith("原神，启动！"):
+    if message == "启动":
         assistant.status = True
         return '已开启'
-    elif is_send_msg == 1 and message.startswith("关机"):
+    elif message == "关闭":
         assistant.status = False
         return '再见，主人'
-    elif message.startswith("原神，启动！"):
-        return '你不是管理员'
 
-    # 对命令进行处理
     if message.startswith("加载预设 "):
         if not assistant.status:
             return '未启动'
@@ -118,11 +115,12 @@ def text_handle(uuid, is_send_msg, message: str) -> str:
 
     # 对一般消息进行回复
     if assistant.status:
-        if message.endswith(' '):
-            reply = assistant.chat(message_dict[assistant.uuid] + '\n问：' + message)
-            message_dict[assistant.uuid] = ''
-            return reply
-        else:
-            message_dict[assistant.uuid] += ('\n' + message)
-    elif message.endswith(' '):
+        if is_send_msg == 0:
+            if (uuid.endswith("@chatroom") and message.endswith(' ')) or uuid.startswith("wxid_"):
+                reply = assistant.chat(message_dict[assistant.uuid] + '\n问：' + message)
+                message_dict[assistant.uuid] = ''
+                return reply
+            else:
+                message_dict[assistant.uuid] += ('\n' + message)
+    else:
         return '未启动'
